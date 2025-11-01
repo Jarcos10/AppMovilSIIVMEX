@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.appmovilsiivmex.navigation.BarraNavegacionInferior
 import com.example.appmovilsiivmex.navigation.NavegacionAuto
@@ -21,11 +22,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppMovilSIIVMEXTheme {
+
                 val controladorNavegacion = rememberNavController()
+                val backStackEntry = controladorNavegacion.currentBackStackEntryAsState()
+                val rutaActual = backStackEntry.value?.destination?.route
+
+                // Lista de rutas sin barra de navegación inferior
+                val rutasSinBarraInferior = listOf("Login")
+
 
                 Scaffold(
                     bottomBar = {
-                        BarraNavegacionInferior(controladorNavegacion)
+                        if(rutaActual !in rutasSinBarraInferior)
+                            BarraNavegacionInferior(controladorNavegacion)
                     }
                 ) { paddingValues ->
                     NavegacionAuto(
@@ -35,21 +44,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AppMovilSIIVMEXTheme {
-        Greeting("Android")
     }
 }

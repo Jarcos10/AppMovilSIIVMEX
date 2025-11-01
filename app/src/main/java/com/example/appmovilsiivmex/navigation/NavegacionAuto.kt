@@ -7,20 +7,30 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.appmovilsiivmex.ui.screens.HoyNoCirculaScreen
 import com.example.appmovilsiivmex.ui.screens.PantallaPlaceholder
+import com.example.appmovilsiivmex.ui.screens.login.LoginScreen
 
-    @Composable
+@Composable
     fun NavegacionAuto(
         controladorNavegacion: NavHostController,
         paddingValues: PaddingValues
     ) {
         NavHost(
             navController = controladorNavegacion,
-            startDestination = "hoy_no_circula"
+            startDestination = "Login"
         ) {
             composable("hoy_no_circula") { HoyNoCirculaScreen() }
             composable("inicio") { PantallaPlaceholder("Inicio") }
             composable("multas") { PantallaPlaceholder("Multas") }
             composable("ubicacion") { PantallaPlaceholder("Ubicación") }
             composable("mi_auto") { PantallaPlaceholder("Mi auto") }
+            composable("Login") {
+                LoginScreen(
+                    onLoginSuccess = {
+                        controladorNavegacion.navigate("hoy_no_circula") {
+                            popUpTo("Login") { inclusive = true }
+                        }
+                    }
+                )
+            }
         }
     }
