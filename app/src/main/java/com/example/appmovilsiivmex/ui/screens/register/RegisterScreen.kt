@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -12,6 +11,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,142 +36,197 @@ import com.example.appmovilsiivmex.ui.theme.ColorGris
 @Composable
 fun RegisterScreen(
     viewModel: RegisterViewModel = viewModel(),
-    onLoginSuccess: () -> Unit = {},
-    onRegisterClick: () -> Unit = {}
+    onGoToLogin: () -> Unit = {},
+    onContinue: () -> Unit = {}
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
-
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .background(Color(0xFFFFFFFF))
+                .background(Color.White)
                 .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(Modifier.height(12.dp))
 
-            Spacer(Modifier.height(15.dp))
-            LoginIllustration(resId = R.drawable.login_illustration)
-            Spacer(Modifier.height(32.dp))
-            TitleAndSubtitle()
-            Spacer(Modifier.height(25.dp))
+            // Ilustración superior (usa tu recurso; si tienes otro, cámbialo)
+            Illustration(resId = R.drawable.register_illustration)
 
-            EmailField(
-                value = uiState.email,
-                onValueChange = viewModel::onEmailChange,
-                error = uiState.emailError,
+            Spacer(Modifier.height(24.dp))
+            TitleAndSubtitle() // Registrarse / subtítulo
+
+            Spacer(Modifier.height(20.dp))
+
+            // Nombre
+            FilledInput(
+                value = uiState.name,
+                onValueChange = viewModel::onNameChange,
+                placeholder = "Nombre completo",
+                leading = { Icon(Icons.Outlined.Person, contentDescription = null, tint = ColorGris) },
                 enabled = !uiState.isLoading
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
 
-            PasswordField(
+            // Correo
+            FilledInput(
+                value = uiState.email,
+                onValueChange = viewModel::onEmailChange,
+                placeholder = "Correo electrónico",
+                leading = { Icon(Icons.Outlined.Email, contentDescription = null, tint = ColorGris) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                isError = uiState.emailError != null,
+                supportingText = uiState.emailError,
+                enabled = !uiState.isLoading
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            // Contraseña
+            PasswordFilledInput(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChange,
                 visible = uiState.showPassword,
                 onToggleVisibility = viewModel::onTogglePasswordVisibility,
-                error = uiState.passwordError,
+                placeholder = "Contraseña",
+                isError = uiState.passwordError != null,
+                supportingText = uiState.passwordError,
                 enabled = !uiState.isLoading
             )
 
-            Spacer(Modifier.height(8.dp))
-            ForgotLink(onClick = { /* TODO */ })
             Spacer(Modifier.height(24.dp))
 
-            LoginButton(
+            // Botón Continuar
+            PrimaryButton(
+                text = "Continuar",
                 isLoading = uiState.isLoading,
-                onClick = viewModel::onLoginClick
+                onClick = {
+                    viewModel.onRegisterClick()
+                    onContinue()
+                }
             )
 
-            Spacer(Modifier.height(8.dp))
-            RegisterRow(onRegisterClick = onRegisterClick)
+            Spacer(Modifier.height(16.dp))
+
+            // ¿Ya tienes una cuenta? Iniciar Sesión
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("¿Ya tienes una cuenta? ", fontSize = 14.sp, color = ColorGris)
+                Text(
+                    text = "Iniciar Sesión",
+                    fontSize = 14.sp,
+                    color = ColorAzulOscuro,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable { onGoToLogin() }
+                )
+            }
         }
     }
 }
 
-// Sub-composables actualizados
+/* ---------- Subcomposables con estilo "filled" (fondo gris, sin borde) ---------- */
+
 @Composable
-private fun EmailField(
+private fun FilledInput(
     value: String,
     onValueChange: (String) -> Unit,
-    error: String?,
-    enabled: Boolean
+    placeholder: String,
+    leading: @Composable (() -> Unit)? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    isError: Boolean = false,
+    supportingText: String? = null,
+    enabled: Boolean = true
 ) {
-    OutlinedTextField(
+    TextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text("Correo electrónico") },
-        leadingIcon = {
-            Icon(
-                Icons.Outlined.Email,
-                null,
-                tint = ColorGris
-            )
-        },
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = ColorAzulOscuro,
-            unfocusedBorderColor = ColorGris,
-            focusedTextColor = ColorAzulOscuro,
-            unfocusedTextColor = ColorGris
-        ),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp),
+        placeholder = { Text(placeholder, color = Color(0xFF9CA3AF)) },
+        leadingIcon = leading,
+        shape = RoundedCornerShape(14.dp),
         singleLine = true,
         enabled = enabled,
-        isError = error != null,
-        supportingText = error?.let { { Text(it) } }
+        isError = isError,
+        keyboardOptions = keyboardOptions,
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = Color(0xFFF2F3F5),
+            focusedContainerColor = Color(0xFFF2F3F5),
+            disabledContainerColor = Color(0xFFEDEFF1),
+            cursorColor = ColorAzulOscuro,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            focusedTextColor = ColorAzulOscuro,
+            unfocusedTextColor = Color.Black
+        )
     )
+    if (supportingText != null && isError) {
+        Spacer(Modifier.height(4.dp))
+        Text(text = supportingText, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+    }
 }
 
 @Composable
-private fun PasswordField(
+private fun PasswordFilledInput(
     value: String,
     onValueChange: (String) -> Unit,
     visible: Boolean,
     onToggleVisibility: () -> Unit,
-    error: String?,
-    enabled: Boolean
+    placeholder: String,
+    isError: Boolean = false,
+    supportingText: String? = null,
+    enabled: Boolean = true
 ) {
-    OutlinedTextField(
+    TextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text("Contraseña") },
-        leadingIcon = {
-            Icon(
-                Icons.Outlined.Lock,
-                null,
-                tint = ColorGris) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp),
+        placeholder = { Text(placeholder, color = Color(0xFF9CA3AF)) },
+        leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null, tint = ColorGris) },
         trailingIcon = {
             IconButton(onClick = onToggleVisibility) {
                 Icon(
-                    if (visible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                    if (visible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                     contentDescription = if (visible) "Ocultar" else "Mostrar",
                     tint = ColorGris
                 )
             }
         },
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = ColorAzulOscuro,
-            unfocusedBorderColor = ColorGris,
-            focusedTextColor = ColorAzulOscuro,
-            unfocusedTextColor = ColorGris
-        ),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        shape = RoundedCornerShape(14.dp),
         singleLine = true,
         enabled = enabled,
-        isError = error != null,
-        supportingText = error?.let { { Text(it) } }
+        isError = isError,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = Color(0xFFF2F3F5),
+            focusedContainerColor = Color(0xFFF2F3F5),
+            disabledContainerColor = Color(0xFFEDEFF1),
+            cursorColor = ColorAzulOscuro,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            focusedTextColor = ColorAzulOscuro,
+            unfocusedTextColor = Color.Black
+        )
     )
+    if (supportingText != null && isError) {
+        Spacer(Modifier.height(4.dp))
+        Text(text = supportingText, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+    }
 }
 
 @Composable
-private fun LoginButton(
+private fun PrimaryButton(
+    text: String,
     isLoading: Boolean,
     onClick: () -> Unit
 ) {
@@ -179,35 +234,29 @@ private fun LoginButton(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp),
-        shape = RoundedCornerShape(12.dp),
+            .height(52.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = ButtonDefaults.buttonColors(containerColor = ColorAzulOscuro)
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(22.dp),
                 color = Color.White,
                 strokeWidth = 2.dp
             )
         } else {
-            Text(
-                "Iniciar Sesión",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
     }
 }
 
-
-
 @Composable
-private fun LoginIllustration(resId: Int) {
+private fun Illustration(resId: Int) {
     Image(
         painter = painterResource(resId),
-        contentDescription = "Ilustración de login",
+        contentDescription = "Ilustración",
         modifier = Modifier
-            .fillMaxWidth(1f)
+            .fillMaxWidth()
             .aspectRatio(1.4f),
         contentScale = ContentScale.Fit
     )
@@ -216,61 +265,19 @@ private fun LoginIllustration(resId: Int) {
 @Composable
 private fun TitleAndSubtitle() {
     Text(
-        "Iniciar Sesión",
+        "Registrarse",
         textAlign = TextAlign.Start,
         color = ColorAzulOscuro,
-        fontSize = 34.sp,
+        fontSize = 32.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.fillMaxWidth()
     )
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(6.dp))
     Text(
-        "Por favor inicia sesión antes de continuar",
+        "Regístrate para poder iniciar sesión",
         fontSize = 14.sp,
         color = ColorGris,
         textAlign = TextAlign.Start,
         modifier = Modifier.fillMaxWidth()
     )
-}
-
-@Composable
-private fun ForgotLink(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Text(
-            text = "¿Olvidaste tu contraseña? ",
-            fontSize = 14.sp,
-            color = ColorGris
-        )
-        Text(
-            text = "Restablecer",
-            fontSize = 14.sp,
-            color = ColorAzulOscuro,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.clickable { onClick() }
-        )
-    }
-}
-
-@Composable
-private fun RegisterRow(onRegisterClick: () -> Unit) {
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            "¿No tienes una cuenta aún? ",
-            fontSize = 14.sp
-        )
-
-        Text(
-            text = "Regístrate",
-            fontSize = 13.sp,
-            color = ColorAzulOscuro,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.clickable { onRegisterClick() }
-        )
-    }
 }
