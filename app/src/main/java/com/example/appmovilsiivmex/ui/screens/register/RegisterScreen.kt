@@ -50,16 +50,12 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(12.dp))
-
-            // Ilustración superior (usa tu recurso; si tienes otro, cámbialo)
             Illustration(resId = R.drawable.register_illustration)
 
             Spacer(Modifier.height(24.dp))
-            TitleAndSubtitle() // Registrarse / subtítulo
+            TitleAndSubtitle()
 
             Spacer(Modifier.height(20.dp))
-
-            // Nombre
             FilledInput(
                 value = uiState.name,
                 onValueChange = viewModel::onNameChange,
@@ -69,8 +65,6 @@ fun RegisterScreen(
             )
 
             Spacer(Modifier.height(12.dp))
-
-            // Correo
             FilledInput(
                 value = uiState.email,
                 onValueChange = viewModel::onEmailChange,
@@ -83,8 +77,6 @@ fun RegisterScreen(
             )
 
             Spacer(Modifier.height(12.dp))
-
-            // Contraseña
             PasswordFilledInput(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChange,
@@ -97,8 +89,6 @@ fun RegisterScreen(
             )
 
             Spacer(Modifier.height(24.dp))
-
-            // Botón Continuar
             PrimaryButton(
                 text = "Continuar",
                 isLoading = uiState.isLoading,
