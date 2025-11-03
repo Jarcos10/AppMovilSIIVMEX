@@ -1,4 +1,4 @@
-package com.example.appmovilsiivmex.ui.screens.passwordreset
+package com.example.appmovilsiivmex.ui.screens.forgotpassword
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

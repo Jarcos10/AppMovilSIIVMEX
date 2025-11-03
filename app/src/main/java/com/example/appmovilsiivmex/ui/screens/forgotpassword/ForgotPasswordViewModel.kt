@@ -1,4 +1,4 @@
-package com.example.appmovilsiivmex.ui.screens.passwordreset
+package com.example.appmovilsiivmex.ui.screens.forgotpassword
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

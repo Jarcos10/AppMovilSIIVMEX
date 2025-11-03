@@ -1,4 +1,4 @@
-package com.example.appmovilsiivmex.ui.screens.passwordreset
+package com.example.appmovilsiivmex.ui.screens.forgotpassword
 
 data class ForgotPasswordUiState(
     val email: String = "",
